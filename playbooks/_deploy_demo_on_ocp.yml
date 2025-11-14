@@ -3,7 +3,6 @@
   hosts: all
 
   tasks:
-
     - name: Install AAP and EDA
       ansible.builtin.include_role:
         name: "install_aap_and_eda_on_ocp"
@@ -65,7 +64,7 @@
         ignore_files:
           - "kafka_config.yml"
         extensions:
-          - 'yml'
+          - "yml"
 
     - name: Perform the actual demo deployment
       ansible.builtin.include_role:

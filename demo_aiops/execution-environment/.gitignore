@@ -1,0 +1,40 @@
+# Ansible Builder artifacts
+context/
+_build/
+
+# Local configuration with secrets
+ansible.cfg.local
+ansible.cfg.secret
+
+# Container build artifacts
+*.tar
+*.tar.gz
+
+# Ansible temporary files
+*.retry
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Test artifacts
+test-results/
+
+# Ansible
+.ansible/

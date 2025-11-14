@@ -1,0 +1,67 @@
+---
+# Ansible Navigator configuration for AIOps Demo
+# Place this file in the root of your project or in your home directory as ~/.ansible-navigator.yml
+
+ansible-navigator:
+  # Execution environment settings
+  execution-environment:
+    enabled: true
+    # Use the locally built EE or pull from a registry
+    image: localhost/aiops-ee:latest
+    # Alternative: use from a registry
+    # image: quay.io/your-username/aiops-ee:latest
+
+    # Pull policy: always, missing, never, tag
+    pull:
+      policy: missing
+
+    # Container engine: podman or docker
+    container-engine: podman
+
+    # Container options
+    # container-options:
+    #   - "--net=host"
+    #   - "--user=root"
+
+    # Volume mounts
+    # volume-mounts:
+    #   - src: "{{ ansible_env.HOME }}/.ssh"
+    #     dest: "/home/runner/.ssh"
+    #     options: "ro"
+
+    # Environment variables to pass to the EE
+    environment-variables:
+      pass:
+        - ANSIBLE_VAULT_PASSWORD_FILE
+        - SSH_AUTH_SOCK
+      set:
+        ANSIBLE_FORCE_COLOR: "true"
+        ANSIBLE_HOST_KEY_CHECKING: "false"
+
+  # Ansible-navigator behavior
+  mode: interactive
+
+  # Playbook artifact settings
+  playbook-artifact:
+    enable: true
+    save-as: "/tmp/ansible-navigator-artifacts/{playbook_name}-artifact-{ts_utc}.json"
+    replay: /tmp/ansible-navigator-artifacts/
+
+  # Logging
+  logging:
+    level: debug
+    file: /tmp/ansible-navigator.log
+    append: true
+
+  # Editor settings
+  editor:
+    command: vim
+    console: true
+
+  # Time zone
+  time-zone: UTC
+
+  # Color settings
+  color:
+    enable: true
+    osc4: true

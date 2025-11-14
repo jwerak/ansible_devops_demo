@@ -1,0 +1,38 @@
+# Additional Python requirements for AIOps Demo Execution Environment
+# These are installed in addition to the packages specified in execution-environment.yml
+
+# Kubernetes and OpenShift clients
+kubernetes>=12.0.0
+openshift>=0.12.0
+
+# AWS SDK
+boto3>=1.26.0
+botocore>=1.29.0
+
+# Azure SDK (for hybrid cloud scenarios)
+azure-mgmt-compute>=30.0.0
+azure-mgmt-network>=23.0.0
+azure-identity>=1.12.0
+
+# HTTP and API clients
+requests>=2.28.0
+urllib3>=1.26.0
+
+# YAML and JSON processing
+pyyaml>=6.0
+jmespath>=1.0.0
+
+# Utilities
+python-dateutil>=2.8.0
+netaddr>=0.8.0
+
+# Event-Driven Ansible dependencies
+aiohttp>=3.8.0
+asyncio-mqtt>=0.16.0
+dpath>=2.0.0
+
+# AI/ML integration (if needed for OCP AI interactions)
+# Uncomment if your workflows interact with AI services directly
+# openai>=1.0.0
+# langchain>=0.1.0
+

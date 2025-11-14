@@ -1,0 +1,37 @@
+---
+# Galaxy Requirements for AIOps Demo Execution Environment
+#
+# IMPORTANT: Some collections require authentication to Red Hat Automation Hub
+#
+# To enable Red Hat certified collections:
+# 1. Get your token from: https://console.redhat.com/ansible/automation-hub/token
+# 2. Update ansible.cfg: Replace TOKEN_PLACEHOLDER with your token
+# 3. In ansible.cfg, change: server_list = galaxy
+#                       to: server_list = automation_hub, galaxy
+# 4. Use requirements-with-hub.yml instead of this file
+#
+# This file uses community alternatives that don't require Automation Hub access.
+
+collections:
+  # Event-Driven Ansible
+  - name: ansible.eda
+
+  # OpenShift and Kubernetes Management
+  - name: redhat.openshift
+
+  - name: kubernetes.core
+
+  # Cloud Providers (for hybrid cloud scenarios)
+  - name: amazon.aws
+
+  - name: azure.azcollection
+
+  # Utility Collections
+  # - name: community.general
+
+  # - name: ansible.posix
+
+  # - name: ansible.utils
+
+  # Container Management
+  # - name: containers.podman

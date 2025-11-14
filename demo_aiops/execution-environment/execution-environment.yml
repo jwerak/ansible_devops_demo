@@ -1,0 +1,58 @@
+# Execution Environment for AIOps Demo
+
+version: 3
+
+images:
+  base_image:
+    name: "registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel9:1.0.0"
+
+dependencies:
+  system:
+    # System packages required for OpenShift and cloud operations
+    - git
+    - rsync
+    - python3-pip
+
+  python:
+    # Python dependencies for various operations
+    - kubernetes>=12.0.0
+    - openshift>=0.12.0
+    - boto3
+    - botocore
+    - requests
+    - jmespath
+    - pyyaml
+
+  galaxy: requirements.yml
+
+additional_build_files:
+  # Copy any additional files needed during build
+  - src: ansible.cfg
+    dest: configs
+
+additional_build_steps:
+
+  prepend_builder:
+    - ENV PKGMGR_OPTS="--nodocs --setopt=install_weak_deps=0 --setopt=rhocp-4.18-for-rhel-9-x86_64-rpms.enabled=true"
+  prepend_final:
+    - ENV PKGMGR_OPTS="--nodocs --setopt=install_weak_deps=0 --setopt=rhocp-4.18-for-rhel-9-x86_64-rpms.enabled=true"
+
+  prepend_base:
+    # Steps to run early in the build process
+    - RUN microdnf install -y python3.11 python3.11-pip && microdnf clean all
+
+  prepend_galaxy:
+    # Copy ansible.cfg before installing galaxy collections
+    # This ensures we can authenticate to Red Hat Automation Hub
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
+    # - ARG ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_VALIDATED_TOKEN
+    # - ARG ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_PUBLISHED_TOKEN
+
+  # append_final:
+  #   # Final steps after all dependencies are installed
+  #   - RUN chmod -R ug+rwx $HOME/.ansible
+
+options:
+  package_manager_path: /usr/bin/microdnf
+#   # Set user to run as (optional, defaults to root)
+#   user: "1000"
