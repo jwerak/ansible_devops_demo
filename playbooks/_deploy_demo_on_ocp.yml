@@ -3,6 +3,11 @@
   hosts: all
 
   tasks:
+    - name: Initialize info collection
+      ansible.builtin.set_fact:
+        collected_info: []
+      when: collected_info is not defined
+
     - name: Install AAP and EDA
       ansible.builtin.include_role:
         name: "install_aap_and_eda_on_ocp"
@@ -96,3 +101,13 @@
       ansible.builtin.debug:
         msg: "Developer Hub Host is: {{ rhdh_hostname }}"
       when: rhdh_hostname is defined
+
+    - name: Display summary of collected info
+      ansible.builtin.debug:
+        msg: |
+          === Playbook Execution Summary ===
+          {% for item in collected_info %}
+          {{ item.name | upper }}
+            Value: {{ item.value }}
+            Description: {{ item.description }}
+          {% endfor %}

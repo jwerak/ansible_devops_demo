@@ -19,7 +19,7 @@
 
 - name: Retrieve the aap project facts for MCP deployment
   ansible.builtin.set_fact:
-    __project_data: "{{ lookup('ansible.controller.controller_api', 
+    __project_data: "{{ lookup('ansible.controller.controller_api',
       'projects',
       query_params= { 'name' : 'aiops-project' },
       host = controller_hostname,
@@ -37,43 +37,42 @@
 
 - name: Perform a set of OpenShift API calls
   block:
+    - name: Log in to the OpenShift API
+      redhat.openshift.openshift_auth:
+        host: "{{ ocp_host }}"
+        username: "{{ ocp_username }}"
+        password: "{{ ocp_password }}"
+        validate_certs: false
+        state: present
+      register: openshift_auth_results
+      when: ocp_token is not defined
 
-  - name: Log in to the OpenShift API
-    redhat.openshift.openshift_auth:
-      host: "{{ ocp_host }}"
-      username: "{{ ocp_username }}"
-      password: "{{ ocp_password }}"
-      validate_certs: false
-      state: present
-    register: openshift_auth_results
-    when: ocp_token is not defined
+    - name: Set the token
+      ansible.builtin.set_fact:
+        __ocp_api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
+      when: ocp_token is not defined
 
-  - name: Set the token
-    ansible.builtin.set_fact:
-      __ocp_api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
-    when: ocp_token is not defined
-    
-  - name: Set the token
-    ansible.builtin.set_fact:
-      __ocp_api_key: "{{ ocp_token }}"
-    when: ocp_token is defined
+    - name: Set the token
+      ansible.builtin.set_fact:
+        __ocp_api_key: "{{ ocp_token }}"
+      when: ocp_token is defined
 
-  - name: Create MCP Resources
-    redhat.openshift.k8s:
-      api_key: "{{ __ocp_api_key }}"
-      host: "{{ ocp_host }}"
-      validate_certs: false
-      state: present
-      namespace: "{{ opa_namespace }}"
-      resource_definition: "{{ lookup('ansible.builtin.template', '../mcp_server/' + mcp_file_item +'.yaml.j2') }}"
-    loop:
-      - mcp_project
-      - mcp_configmap
-      - mcp_deployment
-      - mcp_service
-      - mcp_route
-    loop_control:
-      loop_var: mcp_file_item
+    - name: Create MCP Resources
+      redhat.openshift.k8s:
+        api_key: "{{ __ocp_api_key }}"
+        host: "{{ ocp_host }}"
+        validate_certs: false
+        state: present
+        namespace: "{{ opa_namespace }}"
+        resource_definition: "{{ lookup('ansible.builtin.template', '../mcp_server/' + mcp_file_item +'.yaml.j2') }}"
+      loop:
+        - mcp_project
+        - mcp_configmap
+        - mcp_deployment
+        - mcp_service
+        - mcp_route
+      loop_control:
+        loop_var: mcp_file_item
 
   always:
     - name: If login succeeds, revoke the API key
@@ -84,3 +83,18 @@
         host: "{{ ocp_host }}"
         validate_certs: false
       ignore_errors: true
+
+- name: Generate an AAP API token for the admin user
+  ansible.platform.token:
+    aap_hostname: "{{ controller_hostname }}"
+    aap_username: "admin"
+    aap_password: "{{ controller_password }}"
+    aap_validate_certs: false
+    scope: "write"
+    state: present
+    description: "AAP Admin Token"
+  register: __aap_admin_token_response
+
+- name: Add info record from AAP admin token
+  ansible.builtin.set_fact:
+    collected_info: "{{ collected_info + [{'name': 'aap_admin_token', 'value': __aap_admin_token_response.ansible_facts.aap_token.token, 'description': 'AAP Admin Token'}] }}"
