@@ -1,6 +1,7 @@
 ---
 - name: Setup Demo Environment
   hosts: all
+  gather_facts: false
 
   tasks:
     - name: Initialize info collection
